@@ -6,11 +6,11 @@
 #define HEIGHT 600
 #define AMPLITUDE 100
 #define FREQUENCY 0.1
-#define POINT_COUNT 800 // Number of points in the circular buffer
+#define POINT_COUNT 800 
 
 sfRenderWindow *window = NULL;
-sfCircleShape *points[POINT_COUNT]; // Circular buffer for points
-float xOffset = 0.0f; // Offset for moving the wave horizontally
+sfCircleShape *points[POINT_COUNT]; 
+float xOffset = 0.0f;
 
 void handleEvents() {
     sfEvent event;
@@ -30,9 +30,9 @@ void updatePoints() {
     for (int i = 0; i < WIDTH; i++) {
         float x = i;
         float y = HEIGHT / 2 + sin((x + xOffset) * FREQUENCY) * AMPLITUDE;
-        createPoint(points[i % POINT_COUNT], x, y); // Reuse points in the circular buffer
+        createPoint(points[i % POINT_COUNT], x, y); 
     }
-    xOffset += 0.01f; // Adjust horizontal speed here
+    xOffset += 0.01f;
 }
 
 void drawSineWave() {
@@ -47,11 +47,9 @@ int main() {
     sfVideoMode mode = {WIDTH, HEIGHT, 32};
     window = sfRenderWindow_create(mode, "Smoothly Moving Sine Wave", sfResize | sfClose, NULL);
     if (!window) {
-        // Window creation failed
         return EXIT_FAILURE;
     }
 
-    // Initialize circular buffer with points
     for (int i = 0; i < POINT_COUNT; i++) {
         points[i] = sfCircleShape_create();
     }
@@ -62,7 +60,6 @@ int main() {
         drawSineWave();
     }
 
-    // Clean up resources
     for (int i = 0; i < POINT_COUNT; i++) {
         sfCircleShape_destroy(points[i]);
     }
