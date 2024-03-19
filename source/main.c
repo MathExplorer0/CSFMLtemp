@@ -1,68 +1,45 @@
 #include <SFML/Graphics.h>
 #include <math.h>
-#include <stdlib.h>
+#include <stdio.h>
 
 #define WIDTH 800
 #define HEIGHT 600
-#define AMPLITUDE 100
-#define FREQUENCY 0.1
-#define POINT_COUNT 800 
 
-sfRenderWindow *window = NULL;
-sfCircleShape *points[POINT_COUNT]; 
-float xOffset = 0.0f;
 
-void handleEvents() {
-    sfEvent event;
-    while (sfRenderWindow_pollEvent(window, &event)) {
-        if (event.type == sfEvtClosed)
-            sfRenderWindow_close(window);
-    }
-}
-
-void createPoint(sfCircleShape *point, float x, float y) {
+void drawPoint(sfRenderWindow *window, float x, float y) 
+{
+    sfCircleShape *point = sfCircleShape_create();
     sfCircleShape_setRadius(point, 1);
     sfCircleShape_setFillColor(point, sfWhite);
     sfCircleShape_setPosition(point, (sfVector2f){x, y});
+    sfRenderWindow_drawCircleShape(window, point, NULL);
+    sfCircleShape_destroy(point);
 }
 
-void updatePoints() {
-    for (int i = 0; i < WIDTH; i++) {
-        float x = i;
-        float y = HEIGHT / 2 + sin((x + xOffset) * FREQUENCY) * AMPLITUDE;
-        createPoint(points[i % POINT_COUNT], x, y); 
-    }
-    xOffset += 0.01f;
-}
-
-void drawSineWave() {
-    sfRenderWindow_clear(window, sfBlack);
-    for (int i = 0; i < POINT_COUNT; i++) {
-        sfRenderWindow_drawCircleShape(window, points[i], NULL);
-    }
-    sfRenderWindow_display(window);
-}
-
-int main() {
+int main() 
+{
     sfVideoMode mode = {WIDTH, HEIGHT, 32};
-    window = sfRenderWindow_create(mode, "Smoothly Moving Sine Wave", sfResize | sfClose, NULL);
-    if (!window) {
-        return EXIT_FAILURE;
-    }
+    sfRenderWindow *window = sfRenderWindow_create(mode, "Draw Point", sfResize | sfClose, NULL);
+    sfEvent event;
+    
+    sfRenderWindow_setFramerateLimit(window, 60);
+    
+    size_t counter = 1;
 
-    for (int i = 0; i < POINT_COUNT; i++) {
-        points[i] = sfCircleShape_create();
-    }
+    while (sfRenderWindow_isOpen(window)) 
+    {while (sfRenderWindow_pollEvent(window, &event)){
+        if (event.type == sfEvtClosed)sfRenderWindow_close(window);}
 
-    while (sfRenderWindow_isOpen(window)) {
-        handleEvents();
-        updatePoints();
-        drawSineWave();
-    }
+        sfRenderWindow_clear(window, sfBlack);
+        for (size_t i = 0; i < 300; i++)
+        {
+            drawPoint(window, 5*i, HEIGHT/2 + sin(counter*0.1 + i * 0.3) * 50);
+        }
+        sfRenderWindow_display(window);
 
-    for (int i = 0; i < POINT_COUNT; i++) {
-        sfCircleShape_destroy(points[i]);
-    }
+        counter++;
+        printf("%ld\n", counter);
+    } 
     sfRenderWindow_destroy(window);
-    return EXIT_SUCCESS;
+    return 0;
 }
